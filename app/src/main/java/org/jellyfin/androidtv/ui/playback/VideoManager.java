@@ -104,6 +104,7 @@ public class VideoManager implements IVLCVout.OnNewVideoLayoutListener {
     private boolean nativeMode = false;
     private boolean mSurfaceReady = false;
     public boolean isContracted = false;
+    private MediaSession mediaSession;
 
     public VideoManager(@NonNull Activity activity, @NonNull View view, @NonNull PlaybackOverlayFragmentHelper helper) {
         mActivity = activity;
@@ -118,7 +119,7 @@ public class VideoManager implements IVLCVout.OnNewVideoLayoutListener {
         nightModeEnabled = KoinJavaComponent.<UserPreferences>get(UserPreferences.class).get(UserPreferences.Companion.getAudioNightMode());
 
         mExoPlayer = configureExoplayerBuilder(activity).build();
-        new MediaSession.Builder(activity, mExoPlayer).build();
+        mediaSession = new MediaSession.Builder(activity, mExoPlayer).build();
 
         // Volume normalisation (audio night mode).
         if (nightModeEnabled) enableAudioNightMode(mExoPlayer.getAudioSessionId());
@@ -865,6 +866,11 @@ public class VideoManager implements IVLCVout.OnNewVideoLayoutListener {
             mExoPlayerView.setPlayer(null);
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+
+        if (mediaSession != null) {
+            mediaSession.release();
+            mediaSession = null;
         }
     }
 
